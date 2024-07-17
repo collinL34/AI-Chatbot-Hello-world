@@ -9,7 +9,8 @@ async function run() {
   	// The Gemini 1.5 models are versatile and work with multi-turn conversations (like chat)
   	const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash"});
 
-  	const chat = model.startChat({
+  	// A way to pre-populate follow up prompts to the LLM
+	const chat = model.startChat({
 		history: [
 			{
 				role: "user",
@@ -26,11 +27,9 @@ async function run() {
 	});
 
 	const msg = "How many paws are in my house?";
-
 	const result = await chat.sendMessage(msg);
-	const response = await result.response;
-	const text = response.text();
-	console.log(text);
+	
+	console.log(result.response.text());
 }
 
 run();

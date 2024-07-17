@@ -4,8 +4,8 @@ import { GoogleGenerativeAI } from '@google/generative-ai';
 
 dotenv.config();
 
-const genAI = new GoogleGenerativeAI(process.env.API_KEY);
-const model = genAI.getGenerativeModel({model: 'gemini-1.5-flash'});
+const genAI = new GoogleGenerativeAI(process.env.API_KEY); //Init the LLM agent
+const model = genAI.getGenerativeModel({model: MODEL}); //Define the model
 
 prompt.start();
 console.log('Ask the gini anything ...');
@@ -17,7 +17,7 @@ prompt.get(['prompt'], async(err, data) => {
     }
 
     console.log(`** GenAI text: '${model}' model & prompts '${data.prompt}'\n`)
-    const result = await model.generateContent(data.prompt);
+    const result = await model.generateContentStream(prompts); //Enter the prompt to the LLM; currently not defining any custom context
 
     console.log(result.response.text());
 });
