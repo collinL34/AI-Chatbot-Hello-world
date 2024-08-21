@@ -1,6 +1,8 @@
 import dotenv from "dotenv";
 import { GoogleGenerativeAI } from '@google/generative-ai';
 
+// Example showing streaming of results. Coul be good for sending quick responses.
+
 dotenv.config();
 
 const prompts = process.argv[2]; //Incoming prompt from user

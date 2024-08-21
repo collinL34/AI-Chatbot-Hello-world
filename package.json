@@ -1,17 +1,17 @@
 {
-	"name": "hello-world",
-	"version": "1.0.0",
+	"name": "voice-api-poc",
+	"version": "0.0.1",
 	"main": "index.js",
-	"type": "module",
 	"scripts": {
 		"test": "echo \"Error: no test specified\" && exit 1",
-		"question": "node index.js",
-		"prompt": "node multiTurn.js",
-		"image": "node image.js",
-		"chat": "node chat.js"
+		"prompt": "node build/prompt.js",
+		"build": "npx tsc"
 	},
-	"author": "",
-	"license": "ISC",
+	"contributors": [
+		"Harrison Bowden",
+		"Collin Shelby"
+	],
+	"license": "SEE LICENSE IN LICENSE",
 	"description": "",
 	"dependencies": {
 		"@google/generative-ai": "^0.14.1",
@@ -22,5 +22,8 @@
 		"prettier": "^3.3.3",
 		"prompt": "^1.3.0",
 		"prompt-sync": "^4.2.0"
+	},
+	"devDependencies": {
+		"typescript": "^5.5.4"
 	}
 }

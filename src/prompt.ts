@@ -1,5 +1,5 @@
 import dotenv from "dotenv";
-import { GoogleGenerativeAI } from "@google/generative-ai";
+import { GoogleGenerativeAI, FunctionResponse, FunctionResponsePart } from "@google/generative-ai";
 import readline from "readline";
 
 const findPlace = (place) => {
@@ -22,16 +22,22 @@ async function coordinateToName({ longitude, latitude }) {
     // console.log('data: ', JSON.stringify(data));
     return JSON.stringify(data);
   } catch (error) {
-    throw new Error(error);
+    throw new Error((error as Error).message);
   }
 }
 
 function getLocation() {
-  return { latitude: "45.515050", longitude: "-122.648590", city: "Portland", state: "Oregon", county: "Multnomah" };
+  return {
+    latitude: "45.515050",
+    longitude: "-122.648590",
+    city: "Portland",
+    state: "Oregon",
+    county: "Multnomah",
+  };
 }
 
 const routeToDestination = (destination) => {
-  const currentLocation = getCurrentLocation();
+  const currentLocation = getLocation();
   const tomTomApiKey = process.env.TOM_TOM_API_KEY;
 };
 
@@ -46,40 +52,29 @@ async function getLocalWeather() {
 
     return {
       location: data.location,
-      ...weather
+      ...weather,
     };
   } catch (error) {
-    throw new Error(error);
+    throw new Error((error as Error).message);
   }
 }
 
-async function getLocalWeatherForecast() {
-    const current = getLocation();
-    const url = `http://api.weatherapi.com/v1/forecast.json?q=${current.latitude},${current.longitude}&key=${process.env.WEATHER_API_KEY}&days=7`;
-    try {
-      const response = await fetch(url);
-      const data = await response.json();
-  
-      const forecast = data.forecast.forecastday;
+async function getLocalWeatherForecast(days) {
+  const current = getLocation();
+  const url = `http://api.weatherapi.com/v1/forecast.json?q=${current.latitude},${current.longitude}&key=${process.env.WEATHER_API_KEY}&days=${days}`;
+  try {
+    const response = await fetch(url);
+    const data = await response.json();
 
-      const date = new Date();
-      const datevalues = {
-        year: date.getFullYear(),
-        month: date.getMonth() + 1,
-        date: date.getDate(),
-        hour: date.getHours(),
-        minutes: date.getMinutes(),
-        seconds: date.getSeconds(),
-      };
-  
-      return {
-        ...forecast,
-      };
-    } catch (error) {
-      throw new Error(error);
-    }
+    const forecast = data.forecast.forecastday;
+
+    return {
+      ...forecast,
+    };
+  } catch (error) {
+    throw new Error((error as Error).message);
   }
-  
+}
 
 dotenv.config();
 
@@ -110,6 +105,7 @@ async function startPrompt() {
 
   const lockAndUnlockCarFunctionDeclaration = {
     name: "controlCarLocks",
+    description: "Lock and unlock your car remotely",
     parameters: {
       type: "OBJECT",
       description: "Lock and unlock car",
@@ -132,6 +128,7 @@ async function startPrompt() {
 
   const controlLightFunctionDeclaration = {
     name: "controlLight",
+    description: "Turn on and off smartlight",
     parameters: {
       type: "OBJECT",
       description: "Set the brightness and color temperature of a room light.",
@@ -174,8 +171,7 @@ async function startPrompt() {
 
   const getCurrentLocationDeclaration = {
     name: "getCurrentLocation",
-    description:
-      "Fetch the current location of the user in Latitude and Longitude",
+    description: "Fetch the current location of the user",
   };
 
   const getWeatherDeclaration = {
@@ -185,7 +181,7 @@ async function startPrompt() {
 
   const getWeatherForecastDeclaration = {
     name: "getWeatherForecast",
-    description: "Fetch the 3 day weather forecast for the current location",
+    description: "Fetch the weather forecast for the current location",
   };
 
   // Executable function code. Put it in a map keyed by the function name
@@ -218,30 +214,37 @@ async function startPrompt() {
     getWeather: async () => {
       return await getLocalWeather();
     },
-    getWeatherForecast: async () => {
-        return await getLocalWeatherForecast();
-    }
+    getWeatherForecast: async (days) => {
+      return await getLocalWeatherForecast(days);
+    },
   };
 
-  const genAI = new GoogleGenerativeAI(process.env.API_KEY);
+  let metadata = {
+    functionDeclarations: [
+      getCurrentLocationDeclaration,
+      getDateFunctionDeclaration,
+      getLocationNameFromCordinatesDeclaration,
+      getWeatherForecastDeclaration,
+      lockAndUnlockCarFunctionDeclaration,
+      controlLightFunctionDeclaration,
+      getWeatherDeclaration
+    ],
+  };
+
+  const tools = [metadata];
+
+  const genAI = new GoogleGenerativeAI(process.env.API_KEY || "Invalid");
   const model = genAI.getGenerativeModel({
     model: "gemini-1.5-flash",
-    tools: {
-      functionDeclarations: [
-        controlLightFunctionDeclaration,
-        getCurrentLocationDeclaration,
-        getLocationNameFromCordinatesDeclaration,
-        lockAndUnlockCarFunctionDeclaration,
-        getDateFunctionDeclaration,
-        getWeatherDeclaration,
-        getWeatherForecastDeclaration
-      ],
-    },
+    tools,
   });
 
   const chat = model.startChat();
 
-  const res = await chat.sendMessage(['Were starting a chat conversation', systemMessage]);
+  const res = await chat.sendMessage([
+    "Were starting a chat conversation",
+    systemMessage,
+  ]);
 
   console.log(res.response.text());
 
@@ -250,23 +253,35 @@ async function startPrompt() {
     const calls = result.response.functionCalls();
 
     if (calls) {
-      let data = [];
+      const data: FunctionResponse[] = new Array();
       // TODO: Should probably use Promise.all() instead.
       for (var i = 0; i < calls.length; i++) {
         const call = calls[i];
         console.log("Calling: ", call.name);
         const apiResponse = await functions[call.name](call.args);
-        data.push({
-          functionResponse: {
+        data.push(
+          {
             name: call.name,
             response: apiResponse,
           },
-        });
+        );
       }
+
+
+      const parts = data.map(
+        ({ name, response }): FunctionResponsePart => ({
+          functionResponse: {
+            name,
+            response: {
+              content: response,
+            },
+          },
+        })
+      )
 
       // Send the API response back to the model so it can generate
       // a text response that can be displayed to the user.
-      const result2 = await chat.sendMessage([data, systemMessage]);
+      const result2 = await chat.sendMessage([...parts]);
 
       console.log(result2.response.text());
 
@@ -276,9 +291,12 @@ async function startPrompt() {
       rl.prompt();
     }
   }).on("close", async () => {
-    const result = await chat.sendMessage(['Okay im leaving now, bye!', systemMessage]);
+    const result = await chat.sendMessage([
+      "Okay im leaving now, bye!",
+      systemMessage,
+    ]);
 
-    const bye = result.response.text()
+    const bye = result.response.text();
 
     console.log(bye);
     process.exit(0);
