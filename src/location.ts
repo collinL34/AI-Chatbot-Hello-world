@@ -8,29 +8,8 @@ export function getLocation() {
   };
 }
 
-export const getLocationNameFromCordinatesDeclaration = {
-  name: "getLocationNameFromCordinates",
-  description:
-    "fetch the name of the location from it's latitude and longitude",
-  parameters: {
-    type: "OBJECT",
-    description: "Set the longitude and latitude to lookup the name for",
-    properties: {
-      latitude: {
-        type: "STRING",
-        description: "The latitude",
-      },
-      longitude: {
-        type: "STRING",
-        description: "the longitude",
-      },
-    },
-    required: ["latitude", "longitude"],
-  },
-};
-
-export const findPlace = (place) => {
-  const tomTomApiKey = process.env.TOM_TOM_API_KEY;
+export const findPlace = (place: String) => {
+  const tomTomApiKey = process.env["TOM_TOM_API_KEY"];
   const url = `https://api.tomtom.com/search/2/search/${place}.json?key=${tomTomApiKey}`;
 
   fetch(url)
@@ -40,8 +19,8 @@ export const findPlace = (place) => {
     });
 };
 
-export async function coordinateToName({ longitude, latitude }) {
-  const tomTomApiKey = process.env.TOM_TOM_API_KEY;
+export async function coordinateToName({ longitude, latitude } : {longitude: String, latitude: String}) {
+  const tomTomApiKey = process.env["TOM_TOM_API_KEY"];
   const url = `https://api.tomtom.com/search/2/geocode/${latitude},${longitude}.json?key=${tomTomApiKey}`;
   try {
     const response = await fetch(url);
@@ -53,7 +32,7 @@ export async function coordinateToName({ longitude, latitude }) {
   }
 }
 
-export const routeToDestination = (destination) => {
+export const routeToDestination = (destination: String) => {
   const currentLocation = getLocation();
-  const tomTomApiKey = process.env.TOM_TOM_API_KEY;
+  const tomTomApiKey = process.env["TOM_TOM_API_KEY"];
 };

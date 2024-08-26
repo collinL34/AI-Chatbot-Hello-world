@@ -1,19 +1,19 @@
-import { FunctionResponse, FunctionResponsePart } from "@google/generative-ai";
+import { FunctionCall, FunctionResponse, FunctionResponsePart } from "@google/generative-ai";
 import { coordinateToName, getLocation } from "./location";
 import { setIsLocked, setLightValues } from "./smartHome";
 import { getLocalWeather, getLocalWeatherForecast } from "./weather";
 
 const functions = {
-  controlLight: ({ brightness, colorTemperature }) => {
+  controlLight: ({ brightness, colorTemperature } : {brightness: Number, colorTemperature: String}) => {
     return setLightValues(brightness, colorTemperature);
   },
   getCurrentLocation: () => {
     return getLocation();
   },
-  getLocationNameFromCordinates: async ({ latitude, longitude }) => {
+  getLocationNameFromCordinates: async ({ latitude, longitude } : {latitude: String, longitude: String}) => {
     return await coordinateToName({ longitude, latitude });
   },
-  controlCarLocks: ({ isLocked }) => {
+  controlCarLocks: ({ isLocked } : {isLocked: Boolean}) => {
     return setIsLocked(isLocked);
   },
   getDateAndTime: () => {
@@ -31,19 +31,22 @@ const functions = {
   getWeather: async () => {
     return await getLocalWeather();
   },
-  getWeatherForecast: async (days) => {
+  getWeatherForecast: async (days: Number) => {
     return await getLocalWeatherForecast(days);
   },
 };
 
 export async function handleFunctionCalls(
-  calls,
+  calls: FunctionCall[],
 ): Promise<FunctionResponsePart[]> {
   const data: FunctionResponse[] = new Array();
   // TODO: Should probably use Promise.all() instead.
   for (var i = 0; i < calls.length; i++) {
     const call = calls[i];
-    console.log("Calling: ", call.name);
+    if(!call) {
+      continue;
+    }
+    //@ts-ignore
     const apiResponse = await functions[call.name](call.args);
     data.push({
       name: call.name,

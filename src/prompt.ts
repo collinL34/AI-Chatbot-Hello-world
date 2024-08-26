@@ -19,10 +19,10 @@ const rl = readline.createInterface({
 });
 
 async function startPrompt() {
-  const imageParts = [
-    fileToGenerativePart("./data/images/green.jpg", "image/jpg"), //Past in the file path; next define the type of data
-    fileToGenerativePart("./data/images/red.jpg", "image/jpg"),
-  ];
+  // const imageParts = [
+  //   fileToGenerativePart("./data/images/green.jpg", "image/jpg"), //Past in the file path; next define the type of data
+  //   fileToGenerativePart("./data/images/red.jpg", "image/jpg"),
+  // ];
 
   const model = getAiModel();
   const chat = model.startChat();
@@ -30,7 +30,7 @@ async function startPrompt() {
   const res = await chat.sendMessage([
     "Were starting a chat conversation",
     systemMessage,
-    ...imageParts,
+    // ...imageParts,
   ]);
 
   console.log(res.response.text());
@@ -40,8 +40,10 @@ async function startPrompt() {
     const calls = result.response.functionCalls();
 
     if (calls) {
-      // Send the API response back to the model so it can generate
-      // a text response that can be displayed to the user.
+      /* 
+        Send the API response back to the model so it can generate
+         a text response that can be displayed to the user. 
+         */
       const parts = await handleFunctionCalls(calls);
       const result2 = await chat.sendMessage([...parts]);
 

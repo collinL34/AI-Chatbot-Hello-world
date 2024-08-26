@@ -1,30 +1,16 @@
 import { GenerativeModel, GoogleGenerativeAI } from "@google/generative-ai";
-import { getLocationNameFromCordinatesDeclaration } from "./location";
-import {
-  getCurrentLocationDeclaration,
-  getWeatherDeclaration,
-  getWeatherForecastDeclaration,
-} from "./weather";
-import { lockAndUnlockCarFunctionDeclaration } from "./vehicle";
-import { getDateFunctionDeclaration } from "./dateTime";
-import { controlLightFunctionDeclaration } from "./smartHome";
+import { getFunctionDeclarations } from "./declarations/index";
 
 export function getAiModel(): GenerativeModel {
+  let functions = getFunctionDeclarations();
+
   let metadata = {
-    functionDeclarations: [
-      getCurrentLocationDeclaration,
-      getDateFunctionDeclaration,
-      getLocationNameFromCordinatesDeclaration,
-      getWeatherForecastDeclaration,
-      lockAndUnlockCarFunctionDeclaration,
-      controlLightFunctionDeclaration,
-      getWeatherDeclaration,
-    ],
+    functionDeclarations: [...functions],
   };
 
   const tools = [metadata];
 
-  const genAI = new GoogleGenerativeAI(process.env.API_KEY || "Invalid");
+  const genAI = new GoogleGenerativeAI(process.env["API_KEY"] || "Invalid");
   const model = genAI.getGenerativeModel({
     model: "gemini-1.5-flash",
     tools,
