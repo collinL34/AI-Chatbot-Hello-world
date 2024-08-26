@@ -8,7 +8,7 @@ export function getLocation() {
   };
 }
 
-export const findPlace = (place: String) => {
+export const findPlace = (place: string) => {
   const tomTomApiKey = process.env["TOM_TOM_API_KEY"];
   const url = `https://api.tomtom.com/search/2/search/${place}.json?key=${tomTomApiKey}`;
 
@@ -19,7 +19,7 @@ export const findPlace = (place: String) => {
     });
 };
 
-export async function coordinateToName({ longitude, latitude } : {longitude: String, latitude: String}) {
+export async function coordinateToName({ longitude, latitude } : {longitude: string, latitude: string}) {
   const tomTomApiKey = process.env["TOM_TOM_API_KEY"];
   const url = `https://api.tomtom.com/search/2/geocode/${latitude},${longitude}.json?key=${tomTomApiKey}`;
   try {
@@ -32,7 +32,7 @@ export async function coordinateToName({ longitude, latitude } : {longitude: Str
   }
 }
 
-export const routeToDestination = (destination: String) => {
+export const routeToDestination = (destination: string) => {
   const currentLocation = getLocation();
   const tomTomApiKey = process.env["TOM_TOM_API_KEY"];
 };

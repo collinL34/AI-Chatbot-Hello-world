@@ -1,4 +1,4 @@
-export async function setLightValues(brightness: Number, colorTemperature: String) {
+export async function setLightValues(brightness: number, colorTemperature: string) {
   // This mock API returns the requested lighting values
   return {
     brightness,
@@ -6,7 +6,7 @@ export async function setLightValues(brightness: Number, colorTemperature: Strin
   };
 }
 
-export function setIsLocked(isLocked: Boolean) {
+export function setIsLocked(isLocked: boolean) {
   return {
     isLocked,
   };

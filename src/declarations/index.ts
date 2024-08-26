@@ -10,6 +10,7 @@ import {
 } from "./weather";
 import { controlLightFunctionDeclaration } from "./smartHome";
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export function getFunctionDeclarations(): any[] {
   return [
     getCurrentLocationDeclaration,

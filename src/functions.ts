@@ -4,16 +4,16 @@ import { setIsLocked, setLightValues } from "./smartHome";
 import { getLocalWeather, getLocalWeatherForecast } from "./weather";
 
 const functions = {
-  controlLight: ({ brightness, colorTemperature } : {brightness: Number, colorTemperature: String}) => {
+  controlLight: ({ brightness, colorTemperature } : {brightness: number, colorTemperature: string}) => {
     return setLightValues(brightness, colorTemperature);
   },
   getCurrentLocation: () => {
     return getLocation();
   },
-  getLocationNameFromCordinates: async ({ latitude, longitude } : {latitude: String, longitude: String}) => {
+  getLocationNameFromCordinates: async ({ latitude, longitude } : {latitude: string, longitude: string}) => {
     return await coordinateToName({ longitude, latitude });
   },
-  controlCarLocks: ({ isLocked } : {isLocked: Boolean}) => {
+  controlCarLocks: ({ isLocked } : {isLocked: boolean}) => {
     return setIsLocked(isLocked);
   },
   getDateAndTime: () => {
@@ -31,7 +31,7 @@ const functions = {
   getWeather: async () => {
     return await getLocalWeather();
   },
-  getWeatherForecast: async (days: Number) => {
+  getWeatherForecast: async (days: number) => {
     return await getLocalWeatherForecast(days);
   },
 };
@@ -41,7 +41,7 @@ export async function handleFunctionCalls(
 ): Promise<FunctionResponsePart[]> {
   const data: FunctionResponse[] = new Array();
   // TODO: Should probably use Promise.all() instead.
-  for (var i = 0; i < calls.length; i++) {
+  for (let i = 0; i < calls.length; i++) {
     const call = calls[i];
     if(!call) {
       continue;

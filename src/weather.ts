@@ -18,7 +18,7 @@ export async function getLocalWeather() {
   }
 }
 
-export async function getLocalWeatherForecast(days: Number) {
+export async function getLocalWeatherForecast(days: number) {
   const current = getLocation();
   const url = `http://api.weatherapi.com/v1/forecast.json?q=${current.latitude},${current.longitude}&key=${process.env["WEATHER_API_KEY"]}&days=${days}`;
   try {
