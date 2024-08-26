@@ -19,10 +19,10 @@ const rl = readline.createInterface({
 });
 
 async function startPrompt() {
-  // const imageParts = [
-  //   fileToGenerativePart("./data/images/green.jpg", "image/jpg"), //Past in the file path; next define the type of data
-  //   fileToGenerativePart("./data/images/red.jpg", "image/jpg"),
-  // ];
+  const imageParts = [
+    fileToGenerativePart("./data/images/green.jpg", "image/jpg"), //Past in the file path; next define the type of data
+    fileToGenerativePart("./data/images/red.jpg", "image/jpg"),
+  ];
 
   const model = getAiModel();
   const chat = model.startChat();
@@ -30,7 +30,8 @@ async function startPrompt() {
   const res = await chat.sendMessage([
     "Were starting a chat conversation",
     systemMessage,
-    // ...imageParts,
+    ...imageParts,
+    "You don't need to mention the images of cars"
   ]);
 
   console.log(res.response.text());
