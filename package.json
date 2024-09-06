@@ -1,17 +1,19 @@
 {
-	"name": "hello-world",
-	"version": "1.0.0",
+	"name": "voice-api-poc",
+	"version": "0.0.1",
 	"main": "index.js",
-	"type": "module",
 	"scripts": {
-		"test": "echo \"Error: no test specified\" && exit 1",
-		"question": "node index.js",
-		"prompt": "node multiTurn.js",
-		"image": "node image.js",
-		"chat": "node chat.js"
+		"test": "jest tests",
+		"prompt": "node build/prompt.js",
+		"build": "npx tsc",
+		"format": "npx prettier src --write",
+		"lint": "npx eslint src"
 	},
-	"author": "",
-	"license": "ISC",
+	"contributors": [
+		"Harrison Bowden",
+		"Collin Shelby"
+	],
+	"license": "SEE LICENSE IN LICENSE",
 	"description": "",
 	"dependencies": {
 		"@google/generative-ai": "^0.14.1",
@@ -19,8 +21,19 @@
 		"dotenv": "^16.4.5",
 		"latest-version": "^9.0.0",
 		"pdf2json": "^3.1.3",
-		"prettier": "^3.3.3",
 		"prompt": "^1.3.0",
 		"prompt-sync": "^4.2.0"
+	},
+	"devDependencies": {
+		"@eslint/js": "^9.9.1",
+		"@types/eslint__js": "^8.42.3",
+		"@types/jest": "^29.5.12",
+		"concurrent": "^0.3.2",
+		"eslint": "^9.9.1",
+		"jest": "^29.7.0",
+		"prettier": "^3.3.3",
+		"ts-jest": "^29.2.5",
+		"typescript": "^5.5.4",
+		"typescript-eslint": "^8.3.0"
 	}
 }
